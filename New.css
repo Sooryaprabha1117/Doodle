@@ -1,0 +1,222 @@
+/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #222;
+    color: #fff;
+    height: 100%; /* Ensure full height */
+}
+
+.container {
+    display: flex;
+    flex-direction: row; /* Align menu and content side by side */
+    height: 100vh; /* Full viewport height */
+    overflow: hidden; /* Prevent overflow of container */
+}
+
+/* Menu Styles */
+.menu {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #333;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    width: 20%; /* Fixed width for the menu */
+    overflow-y: auto; /* Allow scrolling in case menu content grows */
+}
+
+.menu .logo {
+    margin-bottom: -30px;
+}
+
+.menu .logo img {
+    width: 100%;
+    height: 100%;
+}
+
+.menu ul {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+}
+
+.menu ul li {
+    padding: 15px;
+    background-color: #444;
+    color: #FFD700;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 18px;
+    margin: 10px 0;
+    transition: background-color 0.3s;
+}
+
+.menu ul li:hover {
+    background-color: #555;
+}
+
+/* Content Layout */
+.content {
+    flex: 1; /* Take remaining space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    overflow-y: auto; /* Allow vertical scrolling for more content */
+    box-sizing: border-box; /* Include padding in size calculations */
+}
+
+.controls {
+    width: 100%;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap; /* Adjust controls layout on small screens */
+}
+
+.controls label {
+    font-weight: bold;
+    color: #FFD700;
+    margin-right: 5px;
+}
+
+.controls select,
+.controls input[type="color"],
+.controls button {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #444;
+    color: #FFD700;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.controls select:hover,
+.controls input[type="color"]:hover,
+.controls button:hover {
+    background-color: #555;
+}
+
+canvas {
+    background-color: #fff;
+    border: 2px solid #FFD700;
+    border-radius: 5px;
+    display: block;
+    flex-shrink: 0; /* Prevent shrinking of canvas */
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+}
+
+.video-player {
+    width: 100%;
+    max-width: 800px;
+    margin-top: 20px;
+}
+
+.video-player video {
+    width: 100%;
+    border: 2px solid #FFD700;
+    border-radius: 5px;
+}
+
+/* Responsive Styles */
+
+/* For small screens (Mobile-first layout) */
+@media screen and (max-width: 768px) {
+    
+    .container {
+        display: flex;
+        flex-direction: column; /* Stack items vertically */
+        height: auto; /* Adjust height to content */
+    }
+
+
+    .menu {
+        width: 100%; /* Full width for the menu */
+        
+        padding: 10px 0; /* Adjust padding for mobile */
+        overflow: hidden; /* Remove scrolling */
+        display: flex;
+        flex-direction: column; /* Align logo and menu items */
+        align-items: center; /* Center align menu content */
+    }
+
+    
+        .menu .logo img {
+            max-width: 250px; /* Increased logo size */
+            height: auto; /* Maintain aspect ratio */
+        }
+
+    
+
+    .menu ul {
+        display: flex;
+        flex-wrap: wrap; /* Wrap menu items if needed */
+        justify-content: center; /* Center align menu items */
+        padding: 5px 0;
+    }
+
+    .menu ul li {
+        width: auto; /* Allow menu items to adjust their width */
+        font-size: 14px; /* Smaller font size */
+        margin: 5px; /* Reduced margin between items */
+        padding: 10px; /* Reduced padding */
+    }
+
+    .content {
+        width: 100%;
+        margin: 0;
+        padding: 10px; /* Adjust padding for small screens */
+    }
+
+    .controls {
+        display: flex; /* Ensure items are in a row */
+        flex-direction: row; /* Horizontal layout */
+        justify-content: center; /* Center-align the controls */
+        align-items: center; /* Center vertically */
+        flex-wrap: wrap; /* Allow wrapping when needed */
+        gap: 10px; /* Consistent spacing between controls */
+        width: 100%; /* Full width for proper alignment */
+        margin-bottom: 15px; /* Reduced spacing below controls */
+    }
+
+    .controls label {
+        font-size: 12px; /* Smaller font size */
+        margin-bottom: 0; /* Align label inline */
+    }
+
+    .controls select,
+    .controls input[type="color"],
+    .controls button {
+        padding: 8px; /* Smaller padding for compact controls */
+        font-size: 14px; /* Smaller font size */
+        flex: 1; /* Allow controls to grow equally */
+        min-width: 80px; /* Prevent controls from shrinking too much */
+        max-width: 150px; /* Limit maximum size for better alignment */
+        text-align: center; /* Center text in controls */
+    }
+    
+
+    canvas {
+        max-width: 100%; /* Make canvas responsive */
+        height: auto; /* Maintain aspect ratio */
+        margin-top: 15px; /* Reduced spacing between elements */
+    }
+
+    .video-player {
+        width: 100%;
+        margin-top: 15px; /* Reduced spacing above video */
+    }
+
+    .video-player video {
+        width: 100%; /* Adjust video to fit screen */
+    }
+}

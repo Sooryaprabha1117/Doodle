@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Shape Drawer with Drag and Resize</title>
+    <link rel="stylesheet" href="New.css">
+</head>
+<body>
+
+<div class="container">
+    <aside class="menu">
+        <div class="logo">
+            <img src="logo.png" alt="Logo">
+        </div>
+        <h2>Tutorials</h2>
+        <ul>
+            <li onclick="playVideo('circle.mp4')">Video 1</li>
+            <li onclick="playVideo('square new.mp4')">Video 2</li>
+            <li onclick="playVideo('oval.mp4')">Video 3</li>
+        </ul>
+    </aside>
+
+    <main class="content">
+        <div class="controls">
+            <label for="shapeSelect">Shape:</label>
+            <select id="shapeSelect">
+                <option value="circle">Circle</option>
+                <option value="square">Square</option>
+                <option value="oval">Oval</option>
+            </select>
+
+            <label for="colorPicker">Color:</label>
+            <input id="colorPicker" type="color" value="#ff0000">
+            <button onclick="clearCanvas()">Clear</button>
+            <button onclick="downloadCanvas()">Download</button>
+        </div>
+
+        <canvas id="drawingCanvas" width="800" height="500"></canvas>
+
+        <div class="video-player">
+            <video id="videoPlayer" controls>
+                <source id="videoSource" src="" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </main>
+</div>
+
+<script>
+const canvas = document.getElementById('drawingCanvas');
+const ctx = canvas.getContext('2d');
+const shapes = [];
+let currentShape = 'circle';
+let fillColor = '#ff0000';
+let selectedShape = null;
+let isDragging = false;
+let isResizing = false;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+let lastTouchX = 0;
+let lastTouchY = 0;
+
+document.getElementById('shapeSelect').addEventListener('change', e => currentShape = e.target.value);
+document.getElementById('colorPicker').addEventListener('change', e => fillColor = e.target.value);
+
+canvas.addEventListener('mousedown', handleMouseDown);
+canvas.addEventListener('mousemove', handleMouseMove);
+canvas.addEventListener('mouseup', handleMouseUp);
+canvas.addEventListener('mouseout', handleMouseUp);
+
+canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+canvas.addEventListener('touchend', handleTouchEnd);
+
+function handleMouseDown(event) {
+    const { offsetX: x, offsetY: y } = event;
+    selectedShape = shapes.find(s => s.contains(x, y));
+
+    if (selectedShape) {
+        selectedShape.isSelected = true;
+        selectedShape.fillColor = fillColor;  // Update only the fill color
+        isDragging = true;
+        dragOffsetX = x - selectedShape.x;
+        dragOffsetY = y - selectedShape.y;
+        drawShapes();
+    } else {
+        shapes.push(createShape(currentShape, x, y));
+        drawShapes();
+    }
+}
+
+
+
+function handleMouseMove(event) {
+    if (isDragging && selectedShape) {
+        const { offsetX: x, offsetY: y } = event;
+        selectedShape.x = x - dragOffsetX;
+        selectedShape.y = y - dragOffsetY;
+        drawShapes();
+    } else if (isResizing && selectedShape && selectedShape.type === 'circle') {
+        const { offsetX: x, offsetY: y } = event;
+        selectedShape.size = Math.sqrt((x - selectedShape.x)**2 + (y - selectedShape.y)**2);
+        drawShapes();
+    }
+}
+
+function handleMouseUp() {
+    isDragging = false;
+    isResizing = false;
+    selectedShape = null;
+}
+
+function handleTouchStart(event) {
+    const touch = event.touches[0];
+    const x = touch.clientX - canvas.getBoundingClientRect().left;
+    const y = touch.clientY - canvas.getBoundingClientRect().top;
+
+    selectedShape = shapes.find(s => s.contains(x, y));
+
+    if (selectedShape) {
+        isDragging = true;
+        dragOffsetX = x - selectedShape.x;
+        dragOffsetY = y - selectedShape.y;
+        lastTouchX = x;
+        lastTouchY = y;
+    }
+}
+
+function handleTouchMove(event) {
+    if (isDragging && selectedShape) {
+        const touch = event.touches[0];
+        const x = touch.clientX - canvas.getBoundingClientRect().left;
+        const y = touch.clientY - canvas.getBoundingClientRect().top;
+
+        selectedShape.x = x - dragOffsetX;
+        selectedShape.y = y - dragOffsetY;
+        drawShapes();
+    }
+    event.preventDefault();
+}
+
+function handleTouchEnd() {
+    isDragging = false;
+    selectedShape = null;
+}
+
+function createShape(type, x, y) {
+    return {
+        type,
+        x,
+        y,
+        size: 50,
+        fillColor: '#ff0000',
+        outlineColor: '#000000',  // Separate outline color
+        radiusX: 70,
+        radiusY: 50,
+        isSelected: false,
+        contains(px, py) {
+            if (this.type === 'circle') return Math.hypot(px - this.x, py - this.y) <= this.size;
+            if (this.type === 'square') return Math.abs(px - this.x) <= this.size && Math.abs(py - this.y) <= this.size;
+            if (this.type === 'oval') {
+                const dx = px - this.x;
+                const dy = py - this.y;
+                return Math.pow(dx / this.radiusX, 2) + Math.pow(dy / this.radiusY, 2) <= 1;
+            }
+        },
+        draw() {
+            ctx.beginPath();
+            if (this.type === 'circle') {
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            } else if (this.type === 'square') {
+                ctx.rect(this.x - this.size, this.y - this.size, this.size * 2, this.size * 2);
+            } else if (this.type === 'oval') {
+                ctx.ellipse(this.x, this.y, this.radiusX, this.radiusY, 0, 0, Math.PI * 2);
+            }
+
+            if (this.isSelected) {
+                ctx.fillStyle = this.fillColor;
+                ctx.fill();
+            }
+
+            ctx.strokeStyle = this.outlineColor;
+            ctx.stroke();
+        }
+    };
+}
+
+function drawShapes() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    shapes.forEach(shape => shape.draw());
+}
+
+function clearCanvas() {
+    shapes.length = 0;
+    drawShapes();
+}
+
+function downloadCanvas() {
+    const link = document.createElement('a');
+    link.download = 'canvas-drawing.png';
+    link.href = canvas.toDataURL();
+    link.click();
+}
+
+function playVideo(videoSrc) {
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoSource = document.getElementById('videoSource');
+    videoSource.src = videoSrc;
+    videoPlayer.load();
+    videoPlayer.play();
+}
+</script>
+</body>
+</html>
